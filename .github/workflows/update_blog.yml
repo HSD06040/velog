@@ -3,7 +3,7 @@ name: Update Blog Posts
 on:
   push:
     branches:
-      - main # 워크플로우가 실행될 브랜치
+      - main  # main 브랜치에서 푸시될 때 실행
   schedule:
     - cron: '0 0 * * *'  # UTC 기준 자정 실행 (한국 시간 오전 9시)
     - cron: '0 15 * * *' # UTC 기준 15:00 실행 (한국 시간 자정)
@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v2
       with:
-        fetch-depth: 0  # 전체 커밋 기록을 가져와야 rebase 가능
+        fetch-depth: 0  # 전체 기록을 가져와야 rebase 가능
 
     - name: Set up Git
       run: |
@@ -41,5 +41,5 @@ jobs:
       run: |
         pip install feedparser gitpython
 
-    - name: Run script
+    - name: Run update script
       run: python scripts/update_blog.py
