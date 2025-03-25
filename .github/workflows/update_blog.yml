@@ -1,14 +1,12 @@
 name: Update Blog Posts
-  
 
 on:
   push:
-      branches:
-        - main # 또는 워크플로우를 트리거하고 싶은 브랜치 이름
+    branches:
+      - main # 워크플로우가 실행될 브랜치
   schedule:
-    # 테스트를 원한다면, `한국 표준시 = UTC + 9` 참고해서 시간 수정한 후 테스트해보기
-    - cron: '0 0 * * *'  # 매일 자정에 실행, UTC 협정 세계시 기준 (한국 시간 기준 오전 9시)
-    - cron: '0 15 * * *' # 매일 자정에 실행, 한국 시간 기준 (UTC 15:00)
+    - cron: '0 0 * * *'  # UTC 기준 자정 실행 (한국 시간 오전 9시)
+    - cron: '0 15 * * *' # UTC 기준 15:00 실행 (한국 시간 자정)
 
 jobs:
   update_blog:
@@ -17,12 +15,22 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # 전체 커밋 기록을 가져와야 rebase 가능
 
-    - name: Push changes
+    - name: Set up Git
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git push https://${{ secrets.GH_PAT }}@github.com/HSD06040/velog.git
+
+    - name: Sync with remote
+      run: |
+        git fetch origin main
+        git rebase origin/main || git reset --hard origin/main
+
+    - name: Push changes
+      run: |
+        git push https://${{ secrets.GH_PAT }}@github.com/HSD06040/velog.git --force
 
     - name: Set up Python
       uses: actions/setup-python@v2
