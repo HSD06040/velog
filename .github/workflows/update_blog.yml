@@ -45,3 +45,4 @@ jobs:
 
     - name: Run script
       run: python scripts/update_blog.py
+      continue-on-error: true
